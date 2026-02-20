@@ -1,0 +1,20 @@
+# Ignore photos folder
+Photos/
+
+# Ignore music folder (optional)
+voice/
+
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE/editor files
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Node / Python / etc. (if any)
+node_modules/
+*.pyc
+__pycache__/
