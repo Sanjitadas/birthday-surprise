@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You ❤️</title>
+<style>
+body {margin:0;font-family:'Segoe UI',sans-serif;background:#0b3c8a;overflow-x:hidden;}
+.hidden{
+  display:none !important;
+}
+
+.center{display:flex;justify-content:center;align-items:center;min-height:100vh;}
+.card{background:white;padding:30px;border-radius:12px;width:90%;max-width:400px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);}
+input{
+  width:100%;
+  padding:14px 16px;
+  margin:15px 0;
+  border-radius:12px;
+  border:2px solid #ddd;
+  font-size:16px;
+  outline:none;
+  transition:all 0.3s ease;
+  background:linear-gradient(135deg,#fff,#ffeef3);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.05);
+}
+
+input:focus{
+  border-color:#ee3d63;
+  box-shadow:0 0 0 4px rgba(238,61,99,0.15);
+  background:white;
+}
+
+button{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;margin:5px;}
+.btn-primary{background:#ee3d63;color:white;}
+.btn-yes{background:#28a745;color:white;}
+#noBtn{
+  background:#dc3545;
+  color:white;
+  position:absolute;
+  transition:all 0.25s ease;
+}
+ 
+.page3{background:white;padding:40px 20px;text-align:center;}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-top:20px;}
+.small-card{background:#f5f5f5;padding:20px;border-radius:10px;cursor:pointer;position:relative;}
+.lock::after{content:"🔒";font-size:24px;position:absolute;top:10px;right:10px;}
+.slider{max-width:300px;margin:20px auto;position:relative;}
+.slider img{width:100%;border-radius:12px;}
+.slider button{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:white;}
+.prev{left:0;}.next{right:0;}
+canvas{position:fixed;top:0;left:0;pointer-events:none;}
+#loveLetter{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.letter-box{background:#fff;max-width:480px;width:90%;padding:35px;border-radius:18px;text-align:left;box-shadow:0 20px 40px rgba(0,0,0,0.4);animation:letterFade 1.2s ease;}
+.letter-box h2{text-align:center;color:#e63946;margin-bottom:20px;}
+.letter-box p{font-size:16px;line-height:1.8;color:#333;margin-bottom:15px;}
+.letter-sign{text-align:center;font-weight:bold;margin-top:25px;color:#0b3c8a;}
+.close-letter{display:block;margin:25px auto 0;background:#e63946;color:white;padding:10px 25px;border-radius:25px;font-size:15px;}
+@keyframes letterFade{from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
+
+/* Hearts */
+.heart{position:fixed;bottom:-20px;font-size:20px;animation:floatUp 6s linear infinite;opacity:0.8;pointer-events:none;}
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1;}100%{transform:translateY(-110vh) scale(1.5);opacity:0;}}
+
+/* Typewriter */
+.typewriter span{border-right:2px solid #e63946;padding-right:3px;animation:blink 1s infinite;}
+@keyframes blink{50%{border-color:transparent;}}
+
+/* Confetti */
+.confetti{position:fixed;width:8px;height:8px;background:hsl(var(--h),100%,50%);top:-10px;animation:fall 3s linear forwards;z-index:9999;}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
+
+/* Final Screen */
+#finalScreen{position:fixed;inset:0;background:linear-gradient(#020024,#090979,#0b3c8a);color:white;display:flex;align-items:center;justify-content:center;font-size:26px;text-align:center;z-index:99999;animation:fadeIn 2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* Polaroids */
+.polaroids{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:40px;}
+.polaroid{background:white;padding:10px;width:140px;transform:rotate(var(--r));box-shadow:0 10px 20px rgba(0,0,0,0.3);cursor:pointer;position:relative;overflow:hidden;transition:transform 0.5s, box-shadow 0.5s;}
+.polaroid img{width:100%;position:absolute;top:0;left:0;opacity:0;transition:opacity 0.8s ease;}
+.polaroid p{text-align:center;font-size:24px;z-index:2;position:relative;}
+.polaroid.revealed img{opacity:1;transform:scale(1.05);}
+.polaroid.revealed{transform:scale(1.05);box-shadow:0 15px 25px rgba(0,0,0,0.4);}
+
+/* Scroll Hint Messages */
+.scroll-hint{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#ee3d63;
+  color:white;
+  padding:12px 20px;
+  border-radius:25px;
+  font-size:14px;
+  box-shadow:0 10px 20px rgba(0,0,0,0.3);
+  animation:fadeUp 0.8s ease;
+  z-index:9998;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translate(-50%,20px);}
+  to{opacity:1;transform:translate(-50%,0);}
+}
+
+/* Disabled Polaroid */
+.polaroid.disabled{
+  pointer-events:none;
+  filter:grayscale(1);
+  opacity:0.6;
+}
+
+/* Program locked hint */
+.locked-hint{
+  margin-top:15px;
+  font-size:14px;
+  color:#999;
+}
+/* Candle */
+#candle{
+  width:30px;
+  height:80px;
+  background:#fff;
+  margin:20px auto;
+  border-radius:6px;
+  position:relative;
+}
+#flame{
+  width:20px;
+  height:20px;
+  background:orange;
+  border-radius:50%;
+  position:absolute;
+  top:-18px;
+  left:5px;
+  animation:flicker 0.15s infinite alternate;
+}
+@keyframes flicker{
+  from{transform:scale(1);}
+  to{transform:scale(0.9);}
+}
+#flame.out{
+  opacity:0;
+  animation:none;
+}
+/* 🌹 Rose Petals */
+.petal{
+  position:fixed;
+  top:-50px;
+  width:22px;
+  height:22px;
+  background:radial-gradient(circle at 30% 30%, #ff9dbb, #c9184a);
+  border-radius: 60% 40% 60% 40%;
+  transform: rotate(45deg);
+  opacity:0.85;
+  pointer-events:none;
+  animation: fallPetal linear forwards;
+  z-index:1;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+}
+
+@keyframes fallPetal{
+  0%{
+    transform: translateY(0) rotate(0deg);
+    opacity:0.9;
+  }
+  100%{
+    transform: translateY(110vh) rotate(360deg);
+    opacity:0.1;
+  }
+}
+
+</style>
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+
+<!-- PASSWORD SCREEN -->
+<div class="center" id="passwordScreen">
+  <div class="card">
+    <h2>🔐 Private Entry</h2>
+    <input id="name" placeholder="Only my special person knows this…💖">
+
+    <input type="password" id="password" placeholder="Enter password">
+    <button class="btn-primary" onclick="checkPassword()">Unlock ❤️</button>
+    <p id="passMsg" style="color:red;margin-top:10px;"></p>
+    <p id="heartbreakMsg" class="hidden">💔 💔 It hurts… but I’ll wait for you🥹😏.</p>
+  </div>
+</div>
+
+<!-- FORM 1 -->
+<div class="center hidden" id="form1">
+  <div class="card">
+    <h2>QUESTION 1</h2>
+    <p style="font-weight:600;color:#ee3d63;">
+      Your Name 💕
+    </p>
+    <input id="userName" placeholder="Fill in the box">
+    <button class="btn-primary" onclick="goForm2()">NEXT</button>
+    <p id="nameMsg" style="color:#c00;margin-top:10px;"></p>
+  </div>
+</div>
+
+<!-- FORM 2 -->
+<div class="center hidden" id="form2">
+  <div class="card" style="position:relative;">
+    <h2>QUESTION 2</h2>
+    <p>Will you be my Valentine?</p>
+    <button class="btn-yes" onclick="yesClicked()">YES</button>
+    <button id="noBtn">NO</button>
+    <p id="valMsg" style="color:#c00;margin-top:20px;"></p>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page3 hidden" id="page3">
+  <h2>I can see the bigggg smile 😁</h2>
+  <p>Scroll down ⬇️</p>
+
+  <div style="margin-top:300px;">
+    <h1>🎉 Advance Happy Birthday Baccha 🎉</h1>
+
+    <!-- SLIDER -->
+    <div class="slider">
+      <img id="slide" src="photos/photo1.jpg">
+      <button class="prev" onclick="prev()">◀</button>
+      <button class="next" onclick="next()">▶</button>
+    </div>
+
+    <!-- POLAROID MEMORIES -->
+    <div class="polaroids" id="memories" data-revealed="0">
+      <div class="polaroid" data-index="0" onclick="revealPhoto(this)">
+         <p>💖</p><img src="photos/photo1.jpg">
+      </div>
+      <div class="polaroid disabled" data-index="1" onclick="revealPhoto(this)">
+         <p>🫶</p><img src="photos/photo2.jpg">
+      </div>
+      <div class="polaroid disabled" data-index="2" onclick="revealPhoto(this)">
+         <p>✨</p><img src="photos/photo3.jpg">
+      </div>
+      <div class="polaroid disabled" data-index="3" onclick="revealPhoto(this)">
+        <p>💋</p><img src="photos/photo4.jpg">
+      </div>
+    </div>
+
+    <!-- PROGRAM -->
+    <h2>Today's Program 💖</h2>
+    <div class="cards">
+      <div class="small-card lock" onclick="unlock(this,'🙏 Temple Visit')">1-💝 Supprise </div>
+      <div class="small-card lock" onclick="unlock(this,'👑 Movei with me')">2- 💝 Supprise</div>
+      <div class="small-card lock" onclick="unlock(this,'🍽️ Dinner with me')">3- 💝 Supprise</div>
+      <div class="small-card lock" onclick="unlock(this,'💃 Travel with Meteor')">4- 💝 Supprise</div>
+    </div>
+    <p class="locked-hint" id="programHint">
+       💝 Memories unlock surprises…
+    </p>
+    <!-- CANDLE -->
+    <div id="candleBox" style="margin-top:40px;">
+         <p>Make a wish… then blow the candle 🎂💨</p>
+         <div id="candle">
+           <div id="flame"></div>
+         </div>
+    </div>
+
+    <button class="btn-primary"
+        style="margin-top:25px;display:none;"
+        onclick="openLetter()">
+     💌 One Last Surprise
+    </button>
+
+  </div>
+</div>
+
+<!-- LOVE LETTER -->
+<div id="loveLetter" class="hidden">
+  <div class="letter-box">
+    <h2>Mr. Khandelwal ❤️</h2>
+    <p class="typewriter" data-text="hhhee mere handsom, It's your birthdayy💋hureyyy✨Okay be serious, from the moment I met you, my heart has belonged to you. You are my joy, my home, my favorite thought, my entire world."></p>
+    <p class="typewriter" data-text="Every day with you is a celebration. Your smile lights up my world and you are sooo cutiee piee😜. you are not only the best son or brother but also you are the bestest patner"></p>
+    <p class="typewriter" data-text="I promise to stand by you in every joy, every challenge, every silence. I choose you… today, tomorrow, and forever. My love for you grows stronger every moment. I'm so proud to call you mine.">
+    I loveeeee youuuu soooooooooooo muchhhhhhhhhhhhhh💓😌❤️"></p>
+    <p class="letter-sign">Happy Birthday, my love 🎂💖<br>Yours Women❤️</p>
+    <button class="close-letter" onclick="closeLetter()">Close 💋</button>
+  </div>
+</div>
+
+<script>
+let scrollStage=0;
+window.addEventListener("scroll",()=>{
+  if(!page3.classList.contains("hidden")){
+    const y=window.scrollY;
+
+    if(y>150 && scrollStage===0){
+      showHint("👀 Ohhh… something is waiting for you");
+      scrollStage++;
+    }
+    if(y>500 && scrollStage===1){
+      showHint("💖 These memories hide surprises…");
+      scrollStage++;
+    }
+    if(y>900 && scrollStage===2){
+      showHint("🎁 Open them slowly… one by one");
+      scrollStage++;
+    }
+  }
+});
+
+function showHint(text){
+  const h=document.createElement("div");
+  h.className="scroll-hint";
+  h.innerText=text;
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),3500);
+}
+/* ELEMENTS */
+const passwordScreen=document.getElementById("passwordScreen");
+const form1=document.getElementById("form1");
+const form2=document.getElementById("form2");
+const page3=document.getElementById("page3");
+const noBtn=document.getElementById("noBtn");
+const password=document.getElementById("password");
+const passMsg=document.getElementById("passMsg");
+const heartbreakMsg=document.getElementById("heartbreakMsg");
+const nameInput=document.getElementById("userName");
+const nameMsg=document.getElementById("nameMsg");
+const valMsg=document.getElementById("valMsg");
+const slide=document.getElementById("slide");
+
+/* PASSWORD */
+function checkPassword(){
+  if(password.value==="6823"){
+    passwordScreen.classList.add("hidden");
+    form1.classList.remove("hidden");
+  } else {
+    passMsg.innerText="Wrong password 😢";
+    passwordScreen.classList.add("heartbreak");
+    heartbreakMsg.classList.remove("hidden");
+    setTimeout(()=>{
+      passwordScreen.classList.remove("heartbreak");
+      heartbreakMsg.classList.add("hidden");
+      passMsg.innerText="";
+      password.value="";
+    },2500);
+  }
+}
+
+/* FORM1 */
+function goForm2(){
+  const allowedNames = ["bachaa", "baccha", "bacha", "bachaaa"];
+  const entered = nameInput.value.trim().toLowerCase();
+
+  if(!allowedNames.includes(entered)){
+    nameMsg.innerText="🥺 That name doesn’t feel like YOU… try again 😭";
+    return;
+  }
+
+  nameMsg.innerText="";
+  form1.classList.add("hidden");
+  form2.classList.remove("hidden");
+
+  noBtn.style.pointerEvents="none";
+  setTimeout(()=>{
+    noBtn.style.pointerEvents="auto";
+    valMsg.innerText="Oops 😜 NO is shy… only YES works!";
+  },5000);
+}
+
+/* NO BUTTON FLOAT */
+noBtn.addEventListener("mouseover", ()=>{
+  if(noBtn.style.pointerEvents==="auto"){
+    noBtn.style.left=Math.random()*200+"px";
+    noBtn.style.top=Math.random()*100+"px";
+  }
+});
+
+function moveNoButton(){
+  const card = form2.querySelector(".card");
+  const cardRect = card.getBoundingClientRect();
+
+  const maxX = cardRect.width - 80;
+  const maxY = cardRect.height - 40;
+
+  const x = Math.random() * maxX;
+  const y = Math.random() * maxY;
+
+  noBtn.style.left = x + "px";
+  noBtn.style.top  = y + "px";
+
+  valMsg.innerText = "😜 Nice try… but NO is not an option ❤️";
+}
+
+// Escape BEFORE click
+noBtn.addEventListener("mouseover", moveNoButton);
+noBtn.addEventListener("mousedown", moveNoButton);
+noBtn.addEventListener("touchstart", moveNoButton);
+
+
+/* YES BUTTON */
+function yesClicked(){
+  form2.classList.add("hidden");
+  page3.classList.remove("hidden");
+  startFireworks();
+  startHearts();
+}
+
+/* SLIDER */
+const photos=["photos/photo1.jpg","photos/photo2.jpg","photos/photo3.jpg","photos/photo4.jpg"];
+let index=0;
+function next(){index=(index+1)%photos.length;slide.src=photos[index];}
+function prev(){index=(index-1+photos.length)%photos.length;slide.src=photos[index];}
+
+/* POLAROID REVEAL */
+function revealPhoto(el){
+  if(el.classList.contains("revealed")) return;
+
+  el.classList.add("revealed");
+  el.classList.remove("disabled");
+
+  const p=el.querySelector("p"); if(p)p.style.display="none";
+  const img=el.querySelector("img"); if(img)img.style.opacity="1";
+  const container=document.getElementById("memories");
+  let revealedCount=parseInt(container.dataset.revealed || "0");
+  revealedCount++;
+  container.dataset.revealed=revealedCount;
+
+  // unlock next polaroid
+  const next=document.querySelector(`.polaroid[data-index="${revealedCount}"]`);
+  if(next) next.classList.remove("disabled");
+
+  // all polaroids done → unlock program
+  if(revealedCount===4){
+    document.getElementById("programHint").innerText=
+      "✨ Now your day unlocks… click the cards 💖";
+  }
+}
+
+
+/* PROGRAM UNLOCK */
+function unlock(card,msg){
+  const revealed=parseInt(
+    document.getElementById("memories").dataset.revealed || "0"
+  );
+
+  if(revealed<4){
+    alert("💝 First open all the memories…");
+    return;
+  }
+
+  card.classList.remove("lock");
+  alert(msg);
+}
+
+
+/* FIREWORKS */
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+function startFireworks(){
+  setInterval(()=>{
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let i=0;i<120;i++){
+      ctx.beginPath();
+      ctx.arc(Math.random()*canvas.width,Math.random()*canvas.height,2,0,Math.PI*2);
+      ctx.fillStyle=`hsl(${Math.random()*360},100%,50%)`;
+      ctx.fill();
+    }
+  },300);
+}
+
+/* HEARTS */
+function startHearts(){
+  setInterval(()=>{
+    const heart=document.createElement("div");
+    heart.className="heart";
+    heart.innerText=["❤️","💖","💕","💘","💗"][Math.floor(Math.random()*5)];
+    heart.style.left=Math.random()*100+"vw";
+    heart.style.fontSize=(16+Math.random()*20)+"px";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),6000);
+  },500);
+}
+
+/* LOVE LETTER */
+function openLetter(){
+  document.getElementById("loveLetter").classList.remove("hidden");
+  startTyping();
+}
+function closeLetter(){
+  document.getElementById("loveLetter").classList.add("hidden");
+  setTimeout(showFinalScreen,800);
+}
+
+/* TYPEWRITER */
+function startTyping(){
+  document.querySelectorAll(".typewriter").forEach(el=>{
+    el.innerHTML="";
+    const text=el.dataset.text;
+    let i=0;
+    const span=document.createElement("span");
+    el.appendChild(span);
+    const interval=setInterval(()=>{
+      span.textContent+=text[i];
+      i++;
+      if(i>=text.length) clearInterval(interval);
+    },40);
+  });
+}
+
+/* FINAL SCREEN */
+function showFinalScreen(){
+  const fs=document.createElement("div");
+  fs.id="finalScreen";
+  fs.innerHTML=`<div><p>This page ends…</p><p><strong>but my love for you doesn’t.</strong></p><br><p>🌙 You’re My Forever 🌙Play your fav song and Dance with me, after cut the cake💖</p></div>`;
+  document.body.appendChild(fs);
+}
+/* 🎂 CANDLE BLOW */
+let audioContext, analyser, mic;
+
+function startCandleListener(){
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+    audioContext=new AudioContext();
+    analyser=audioContext.createAnalyser();
+    mic=audioContext.createMediaStreamSource(stream);
+    mic.connect(analyser);
+    analyser.fftSize=256;
+
+    const data=new Uint8Array(analyser.frequencyBinCount);
+    const flame=document.getElementById("flame");
+
+    function listen(){
+      analyser.getByteFrequencyData(data);
+      const volume=data.reduce((a,b)=>a+b)/data.length;
+
+      if(volume>60){
+        flame.classList.add("out");
+        showHint("🎉 Your wish is sealed 💖");
+        unlockSurprise();
+        return;
+      }
+      requestAnimationFrame(listen);
+    }
+    listen();
+  });
+}
+
+function unlockSurprise(){
+  document.querySelector(
+    'button[onclick="openLetter()"]'
+  ).style.display="inline-block";
+}
+
+/* Start candle when page3 opens */
+const originalYes=yesClicked;
+yesClicked=function(){
+  originalYes();
+  setTimeout(startCandleListener,1500);
+};
+/* 🌹 CONTINUOUS ROSE PETALS */
+function startRosePetals(){
+  setInterval(()=>{
+    const petal=document.createElement("div");
+    petal.className="petal";
+
+    petal.style.left=Math.random()*100+"vw";
+    petal.style.animationDuration=(6+Math.random()*6)+"s";
+    petal.style.transform=`rotate(${Math.random()*360}deg)`;
+
+    document.body.appendChild(petal);
+
+    setTimeout(()=>petal.remove(),12000);
+  },300);
+}
+
+/* Start petals immediately */
+startRosePetals();
+
+</script>
+</body>
+</html>
